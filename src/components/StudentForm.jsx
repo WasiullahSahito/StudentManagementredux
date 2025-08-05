@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { FiUser, FiMail, FiCalendar, FiBook, FiSave, FiX } from 'react-icons/fi';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { addStudent, updateStudent } from '../features/studentSlice';
 
 const studentSchema = Yup.object({
@@ -24,32 +24,32 @@ const studentSchema = Yup.object({
 
 const StudentForm = ({ editData, onCancel }) => {
     const dispatch = useDispatch();
-    const students = useSelector(state => state.students);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const formik = useFormik({
         initialValues: {
-            id: editData?.id || Date.now(),
+            id: editData?.id || '',
             name: editData?.name || '',
             email: editData?.email || '',
             age: editData?.age || '',
             grade: editData?.grade || '',
         },
+        enableReinitialize: true, // Allows form to update when editData changes
         validationSchema: studentSchema,
         onSubmit: (values) => {
             setIsSubmitting(true);
 
-            setTimeout(() => {
+            setTimeout(() => { // Simulate API call
                 if (editData) {
                     dispatch(updateStudent(values));
                 } else {
-                    // Generate new ID if not editing
+                    // Generate new ID only when adding a new student
                     dispatch(addStudent({ ...values, id: Date.now() }));
                 }
 
                 formik.resetForm();
                 setIsSubmitting(false);
-                onCancel();
+                onCancel(); // Clear the editing state in App.jsx
             }, 400);
         },
     });
@@ -152,7 +152,7 @@ const StudentForm = ({ editData, onCancel }) => {
                     <button
                         type="submit"
                         className="submit-btn"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !formik.isValid || !formik.dirty}
                     >
                         <FiSave size={18} />
                         {isSubmitting ? 'Processing...' : editData ? 'Update Student' : 'Add Student'}
@@ -162,10 +162,7 @@ const StudentForm = ({ editData, onCancel }) => {
                         <button
                             type="button"
                             className="cancel-btn"
-                            onClick={() => {
-                                formik.resetForm();
-                                onCancel();
-                            }}
+                            onClick={onCancel}
                         >
                             <FiX size={18} />
                             Cancel Edit

@@ -33,6 +33,7 @@ const StudentList = ({ onEdit }) => {
                 <table>
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Age</th>
@@ -43,6 +44,7 @@ const StudentList = ({ onEdit }) => {
                     <tbody>
                         {students.map((student) => (
                             <tr key={student.id}>
+                                <td>{student.id}</td>
                                 <td>{student.name}</td>
                                 <td>{student.email}</td>
                                 <td>{student.age}</td>
